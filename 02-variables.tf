@@ -24,6 +24,28 @@ variable "environment" {
   default     = "dev3"
 }
 
+# Add some tags
+variable "tags" {
+  type = map(string)
+  default = {
+    env   = "dev"
+    TTL   = "48h"
+    owner = "demouser"
+  }
+  description = "Tags that should be assigned to the resources in this example"
+}
+
+# SSH key variables
+variable "ssh_key" {
+  description = "The name of a SSH key pair saved in azure"
+  default     = "demouser-dev-ssh_key"
+}
+
+variable "ssh_key_resource_group" {
+  description = "The name of the resource group in Azure"
+  default     = "demouser-dev-ssh_rg"
+}
+
 
 # AKS Input Variables
 
