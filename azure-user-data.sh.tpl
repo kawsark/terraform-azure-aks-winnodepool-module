@@ -16,15 +16,18 @@ apt-get install -y kubectl
 echo "[Startup] - Installing other tools"
 sudo apt-get install jq git -y
 
-echo "[Startup] - Write kube config"
+echo "[Startup] - Writing kube config"
 cd /home/azureuser/
+echo ${kube_config_b64} > config_b64
 mkdir -p ./.kube
-echo ${kube_config} > .kube/config
+base64 --decode config_b64 > .kube/config
 chown azureuser:azureuser -R /home/azureuser/.kube
 
 echo "[Startup] - Clone this repo"
 git clone https://gitlab.com/kawsark/terraform-azure-aks-winnodepool.git
 cd terraform-azure-aks-winnodepool
+
+echo "[Startup] - Applying kubeconfig"
 kubectl apply -R -f kube-manifests/
 
 # List Pods

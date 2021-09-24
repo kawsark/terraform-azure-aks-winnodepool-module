@@ -101,6 +101,6 @@ resource "azurerm_linux_virtual_machine" "devvm" {
 data "template_file" "startup_script" {
   template = file("${path.module}/azure-user-data.sh.tpl")
   vars = {
-    kube_config = azurerm_kubernetes_cluster.aks_cluster.kube_config_raw
+    kube_config_b64 = base64encode(azurerm_kubernetes_cluster.aks_cluster.kube_config_raw)
   }
 }
