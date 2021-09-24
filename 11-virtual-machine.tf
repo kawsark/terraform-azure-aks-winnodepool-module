@@ -93,7 +93,7 @@ resource "azurerm_linux_virtual_machine" "devvm" {
     public_key = data.azurerm_ssh_public_key.devvm_ssh.public_key
   }
 
-  custom_data = data.template_file.startup_script.rendered
+  custom_data = base64encode(data.template_file.startup_script.rendered)
 
   tags = var.tags
 }
