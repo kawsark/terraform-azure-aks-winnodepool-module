@@ -91,7 +91,10 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     load_balancer_sku = "Standard"
   }
 
-  tags = {
-    Environment = var.environment
+  tags = var.tags
+
+  # Enable the dashboard
+  kube_dashboard {
+    enabled = true
   }
 }
