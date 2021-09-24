@@ -68,6 +68,12 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
       enabled                    = true
       log_analytics_workspace_id = azurerm_log_analytics_workspace.insights.id
     }
+
+    # Enable the dashboard
+    kube_dashboard {
+      enabled = true
+    }
+
   }
 
   # RBAC and Azure AD Integration Block
@@ -91,10 +97,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     load_balancer_sku = "Standard"
   }
 
+
   tags = var.tags
 
-  # Enable the dashboard
-  kube_dashboard {
-    enabled = true
-  }
 }
