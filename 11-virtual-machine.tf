@@ -93,5 +93,14 @@ resource "azurerm_linux_virtual_machine" "devvm" {
     public_key = data.azurerm_ssh_public_key.devvm_ssh.public_key
   }
 
+  custom_data = data.template_file.startup_script.rendered
+
   tags = var.tags
+}
+
+data "template_file" "startup_script" {
+  template = file("${path.module}/azure-user-data.sh.tpl")
+  vars = {
+    kube_config = azurerm_kubernetes_cluster.aks_cluster.kube_config_raw
+  }
 }
