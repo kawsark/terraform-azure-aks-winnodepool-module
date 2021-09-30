@@ -102,3 +102,68 @@ EOF
 
 vault read azure/creds/my-role
 ```
+
+
+# Using Kawsar's Remote Vault
+
+
+## Download state file
+
+```bash
+url=<state file url>
+wget -O terraform.tfstate ${url}
+```
+
+## Save private key
+
+```bash
+rm -f ./private_key.pem
+terraform output private_key > ./private_key.pem && chmod 400 ./private_key.pem
+```
+
+## Export ip address and connect via SSH
+
+```bash
+ip=$(terraform output -json external_ip | jq -r '.[0]')
+ssh -i ./private_key.pem ubuntu@${ip}
+```
+
+## Get root token and unseal key from the remote host at `onboarding/docker-compose/scripts/vault.txt` and copy it elsewhere
+
+```bash
+export VAULT_TOKEN=$(cat $HOME/onboarding/docker-compose/scripts/vault.txt | jq -r '.root_token')
+echo $VAULT_TOKEN
+```
+
+# Helpful
+
+## Get the Azure Secrets Engine config information w/ curl
+
+```bash
+curl $VAULT_ADDR/v1/sys/health
+
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    $VAULT_ADDR/v1/sys/mounts
+
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    $VAULT_ADDR/v1/azure-demo/config
+
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request LIST \
+    $VAULT_ADDR/v1/azure-demo/roles
+```
+
+## Get the Azure Secrets Engine config information w/ Vault CLI
+
+```bash
+vault read sys/health
+vault read sys/mounts
+vault read azure-demo/config
+vault list azure-demo/roles
+
+vault read azure-demo/creds/rg-alice-demoapp-dev-role
+vault read azure-demo/creds/rg-alice-demoapp-qa-role
+```

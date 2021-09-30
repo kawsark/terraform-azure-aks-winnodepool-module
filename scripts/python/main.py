@@ -11,15 +11,20 @@ TFC_URL = os.getenv("TFC_URL", None)  # ex: https://app.terraform.io
 VAULT_ADDR = os.getenv("VAULT_ADDR", "http://localhost:8200")
 VAULT_TOKEN = os.getenv("VAULT_TOKEN", None)
 
-# TODO: have two separate ones or how to handle with the subscription generation?
+# TODO: handle both Kawsar's public Vault instance and the local one
+# TODO: have one for privileged, one for unprivileged
+# TODO: how to handle the generated subscription?
 VAULT_AZURE_PRIV_ROLE="my-role"
 VAULT_AZURE_UNPRIV_ROLE="my-role"
-
+VAULT_AZURE_PATH="azure"
+# TODO: these roles don't work (rg-alice-demoapp-dev-role, rg-alice-demoapp-qa-role)
+# VAULT_AZURE_PRIV_ROLE="rg-alice-demoapp-qa-role"
+# VAULT_AZURE_UNPRIV_ROLE="rg-alice-demoapp-qa-role"
+# VAULT_AZURE_PATH="azure-demo"
 
 def get_azure_creds(vault_client, vault_azure_role):
-	# TODO: take the role as a variable
-	azure_config = vault_client.secrets.azure.read_config()
-	azure_creds = vault_client.secrets.azure.generate_credentials(name=vault_azure_role)
+	azure_config = vault_client.secrets.azure.read_config(mount_point=VAULT_AZURE_PATH)
+	azure_creds = vault_client.secrets.azure.generate_credentials(mount_point=VAULT_AZURE_PATH, name=vault_azure_role)
 
 	subscription_id = azure_config["subscription_id"]
 	tenant_id = azure_config["tenant_id"]
@@ -192,15 +197,17 @@ if __name__ == "__main__":
 	# TODO: why does this take so long?
 	TIMEOUT_TIME=120
 	vault_client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN, timeout=TIMEOUT_TIME)
+	# get_azure_creds(vault_client, VAULT_AZURE_PRIV_ROLE)
+	test_azure(vault_client)
 
 	priv_config = config["privileged"]
 	unpriv_config = config["unprivileged"]
 
 	# Create the AKS cluster w/ elevated credentials
-	priv_ws = create_ws(priv_config, tfc_client, vault_client)
-	priv_ws_id = priv_ws["data"]["id"]
-	populate_tf_vars(priv_ws_id, priv_config)
-	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
+	# priv_ws = create_ws(priv_config, tfc_client, vault_client)
+	# priv_ws_id = priv_ws["data"]["id"]
+	# populate_tf_vars(priv_ws_id, priv_config)
+	# populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
 	# Create the secondary workspace with non-elevated credentials
 	# create_ws(config["unprivileged"], tfc_client, vault_client)

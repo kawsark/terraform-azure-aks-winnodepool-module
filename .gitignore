@@ -12,6 +12,7 @@ crash.log
 # Other files
 *.pem
 secrets.op.sh
+secrets.kawsar.sh
 vault-demo.json
 
 # Ignore any .tfvars files that are generated automatically for each Terraform run. Most
