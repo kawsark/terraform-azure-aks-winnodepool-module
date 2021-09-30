@@ -15,9 +15,10 @@ variables:
 cache:
   paths:
     - .cache/pip
-    - venv/
+    - scripts/venv/
 
 before_script:
+  - cd scripts
   - python -V  # Print out python version for debugging
   - pip install virtualenv
   - virtualenv venv
@@ -28,6 +29,7 @@ run:
     # - python setup.py bdist_wheel
     # an alternative approach is to install and run:
     # - pip install dist/*
+    - cd scripts
     - pwd
     - ls
     - pip install -r pip-reqs.txt
