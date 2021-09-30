@@ -7,7 +7,7 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-privileged",
-		"auto_apply": true,
+		"auto_apply": false,
 		"variables": [
 			{
 				"key": "environment",
