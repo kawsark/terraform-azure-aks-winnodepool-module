@@ -1,0 +1,50 @@
+{
+	"privileged": {
+		"org_name": "GitLabCI-demos",
+		"vcs_oauth_id": "ot-kzVdMdDnvL3y4Ywt",
+		"vcs_repo": "kawsark/terraform-azure-aks-winnodepool-module",
+		"tf_version": "1.0.7",
+		"working_dir": "",
+		"branch": "main",
+		"ws_name": "neil-test-aks-privileged",
+		"variables": {
+			"environment": {
+				"value": "dev",
+				"sensitive": false,
+				"hcl": false
+			},
+			"location": {
+				"value": "Central US",
+				"sensitive": false,
+				"hcl": false
+			},
+			"resource_group_name": {
+				"value": "hashi-atyeti-demo-terraform-aks",
+				"sensitive": false,
+				"hcl": false
+			},
+			"ssh_key_resource_group": {
+				"value": "TODO",
+				"sensitive": false,
+				"hcl": false
+			},
+			"ssh_key": {
+				"value": "TODO",
+				"sensitive": false,
+				"hcl": false
+			}
+		}
+	},
+	"unprivileged": {
+		"org_name": "GitLabCI-demos",
+		"vcs_oauth_id": "ot-kzVdMdDnvL3y4Ywt",
+		"vcs_repo": "kawsark/terraform-azure-devvm-aks",
+		"tf_version": "1.0.7",
+		"working_dir": "",
+		"branch": "main",
+		"ws_name": "neil-test-aks-unprivileged",
+		"variables": {
+
+		}
+	}
+}
