@@ -31,9 +31,6 @@ run:
     # - pip install dist/*
     - pwd
     - ls
-    - cd scripts/python/
-    - pwd
-    - ls
     - pip install -r pip-reqs.txt
     # run the command here
     - python main.py
