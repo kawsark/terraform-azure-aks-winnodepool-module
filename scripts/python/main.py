@@ -14,19 +14,20 @@ VAULT_AZURE_PRIV_ROLE="my-role"
 VAULT_AZURE_UNPRIV_ROLE="my-role"
 
 
-def build_create_ws_payload(ws_name, tf_version, working_dir, vcs_repo, vcs_oauth_id, branch):
+def build_create_ws_payload(ws):
 	return {
 		"data": {
 			"type": "workspaces",
 			"attributes": {
-				"name": ws_name,
-				"terraform_version": tf_version,
-				"working-directory": working_dir,
+				"name": ws["ws_name"],
+				"terraform_version": ws["tf_version"],
+				"working-directory": ws["working_dir"],
+				"auto-apply": ws["auto_apply"],
 				"global-remote-state": True,
 				"vcs-repo": {
-					"identifier": vcs_repo,
-					"oauth-token-id": vcs_oauth_id,
-					"branch": branch
+					"identifier": ws["vcs_repo"],
+					"oauth-token-id": ws["vcs_oauth_id"],
+					"branch": ws["branch"]
 				}
 			}
 		}
@@ -56,8 +57,27 @@ def build_create_var_payload(ws_id, var):
 		}
 	}
 
+def build_create_run_payload(ws_id):
+	return {
+		"data": {
+			"attributes": {
+				"message": "TODO: creating a run from script"
+			},
+			"type":"runs",
+			"relationships": {
+				"workspace": {
+					"data": {
+						"type": "workspaces",
+						"id": ws_id
+					}
+				},
+			}
+		}
+	}
+
 
 def create_privileged_ws(ws_config, tfc_client, vault_client):
+	# TODO: break down this function into multiple functions that can be re-used
 	org_name = ws_config["org_name"]
 	ws_name = ws_config["ws_name"]
 
@@ -66,14 +86,17 @@ def create_privileged_ws(ws_config, tfc_client, vault_client):
 	workspace = None
 	try:
 		workspace = tfc_client.workspaces.show(workspace_name=ws_name)
-	except TFCHTTPNotFound as notfound:
+		# NOTE: only use this when not auto-applying, as then we may have orphaned resources
+		# TODO: remove this when I'm not iterating, as this deletes the workspace
+		# print(f"Workspace {ws_name} found, deleting it while iterating...")
+		# tfc_client.workspaces.destroy(workspace_name=ws_name)
+		workspace = None
+	except TFCHTTPNotFound:
 		print(f"Workspace {ws_name} not found.")
 
 	if workspace is None:
 		print(f"Creating workspace {ws_name}")
-		create_ws_payload = build_create_ws_payload(\
-			ws_name, ws_config["tf_version"], ws_config["working_dir"], ws_config["vcs_repo"], \
-				ws_config["vcs_oauth_id"], ws_config["branch"])
+		create_ws_payload = build_create_ws_payload(ws_config)
 		workspace = tfc_client.workspaces.create(create_ws_payload)
 
 	ws_id = workspace["data"]["id"]
@@ -85,7 +108,9 @@ def create_privileged_ws(ws_config, tfc_client, vault_client):
 		tfc_client.workspace_vars.create(ws_id, create_var_payload)
 
 	# Once the workspace is created, get the variables that are needed from Vault
+	print("Getting Azure Creds from Vault, this may take a moment...")
 	azure_creds_vars = get_azure_creds(vault_client)
+	print("Azure Creds retrieved from Vault")
 
 	# Inject the credentials into the workspace
 	for var in azure_creds_vars:
@@ -93,6 +118,9 @@ def create_privileged_ws(ws_config, tfc_client, vault_client):
 		tfc_client.workspace_vars.create(ws_id, create_var_payload)
 
 	# Trigger a run on the workspace
+	create_run_payload = build_create_run_payload(ws_id)
+	created_run = tfc_client.runs.create(create_run_payload)
+	print(created_run)
 
 	# Wait for the run to complete, then create the next workspace
 
@@ -111,9 +139,7 @@ def create_unprivileged_ws(ws_config, tfc_client):
 
 	if existing_ws is None:
 		print(f"Creating workspace {ws_name}")
-		create_ws_payload = build_create_ws_payload(\
-			ws_name, ws_config["tf_version"], ws_config["working_dir"], ws_config["vcs_repo"], \
-				ws_config["vcs_oauth_id"], ws_config["branch"])
+		create_ws_payload = build_create_ws_payload(ws_config)
 		created_ws = tfc_client.workspaces.create(create_ws_payload)
 		print("UNPRIVILEGED", created_ws)
 

@@ -7,6 +7,7 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-privileged",
+		"auto_apply": true,
 		"variables": [
 			{
 				"key": "environment",
@@ -31,14 +32,14 @@
 			},
 			{
 				"key": "ssh_key_resource_group",
-				"value": "TODO",
+				"value": "demouser-dev-ssh_rg",
 				"sensitive": false,
 				"hcl": false,
 				"category": "terraform"
 			},
 			{
 				"key": "ssh_key",
-				"value": "TODO",
+				"value": "demouser-dev-ssh_key",
 				"sensitive": false,
 				"hcl": false,
 				"category": "terraform"
@@ -53,6 +54,7 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-unprivileged",
+		"auto-apply": false,
 		"variables": []
 	}
 }
