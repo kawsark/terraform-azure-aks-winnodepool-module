@@ -18,7 +18,7 @@ cache:
     - scripts/venv/
 
 before_script:
-  - cd scripts
+  - cd scripts/python/
   - python -V  # Print out python version for debugging
   - pip install virtualenv
   - virtualenv venv
@@ -31,7 +31,7 @@ run:
     # - pip install dist/*
     - pwd
     - ls
-    - cd scripts
+    - cd scripts/python/
     - pwd
     - ls
     - pip install -r pip-reqs.txt
