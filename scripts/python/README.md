@@ -1,28 +1,30 @@
-# Setting up Vault from Scratch
+# Testing and Using the Script
+
+## Setting up Vault from Scratch
 
 [Kawsar's Blog](https://medium.com/hashicorp-engineering/onboarding-the-azure-secrets-engine-for-vault-f09d48c68b69) outlines what happens below.
 
-## Start a Vault Dev Server
+### Start a Vault Dev Server
 
 ```bash
 vault server -dev -dev-root-token-id=root
 ```
 
-## Export the Vault Env Vars
+### Export the Vault Env Vars
 
 ```bash
 export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_TOKEN="root"
 ```
 
-## Log in to Azure
+### Log in to Azure
 
 ```bash
 az login
 az account list
 ```
 
-## TODO: Title
+### Set Some Required Env Vars for this Flow
 
 ```bash
 export CREDS_FILE_PATH="vault-demo.json"
@@ -30,13 +32,13 @@ export ARM_SP_NAME="neil_vault_demo"
 export ARM_SUBSCRIPTION_ID=$(az account list | jq -r ".[0].id")
 ```
 
-## TODO: Title
+### Create a Service Principal with the "Owner" Role
 
 ```bash
 az ad sp create-for-rbac -n $ARM_SP_NAME --role="Owner" --scopes="/subscriptions/$ARM_SUBSCRIPTION_ID" > $CREDS_FILE_PATH
 ```
 
-## TODO: Title
+### Set the Required Azure Env Vars
 
 ```bash
 export ARM_CLIENT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .appId)"
@@ -45,14 +47,18 @@ export ARM_CLIENT_SECRET="$(cat ${CREDS_FILE_PATH} | jq -r .password)"
 export RESOURCE_GROUP="rg-alice-demoapp-dev" # TODO: why is this name hardcoded?
 ```
 
-## TODO: Title
+### Create the Owner Role Assignment
 
 ```bash
 # Create owner Role assignment
 az role assignment create --assignee ${ARM_CLIENT_ID} \
   --role "Owner" \
   --subscription ${ARM_SUBSCRIPTION_ID}
+```
 
+### Add the Permissions to the New Role
+
+```bash
 # Setting permission ID variables
 resourceAccessid1="311a71cc-e848-46a1-bdf8-97ff7156d8e6=Scope"
 resourceAccessid2="1cda74f2-2616-4834-b122-5cb1b07f8a59=Role"
@@ -74,13 +80,13 @@ az ad app permission admin-consent --id ${ARM_CLIENT_ID}
 az ad app permission list --id ${ARM_CLIENT_ID}
 ```
 
-Then create the resource group:
+### Create the Resource Group
 
 ```bash
 az group create -l westus -n "${RESOURCE_GROUP}"
 ```
 
-# TODO: set the role name in an env var
+### Configure Vault for Azure Dynamic Secrets
 
 ```bash
 vault secrets enable azure
@@ -103,41 +109,41 @@ EOF
 vault read azure/creds/my-role
 ```
 
+---
 
-# Using Kawsar's Remote Vault
+## Using Kawsar's Remote Vault
 
-
-## Download state file
+### Download state file
 
 ```bash
 url=<state file url>
 wget -O terraform.tfstate ${url}
 ```
 
-## Save private key
+### Save private key
 
 ```bash
 rm -f ./private_key.pem
 terraform output private_key > ./private_key.pem && chmod 400 ./private_key.pem
 ```
 
-## Export ip address and connect via SSH
+### Export ip address and connect via SSH
 
 ```bash
 ip=$(terraform output -json external_ip | jq -r '.[0]')
 ssh -i ./private_key.pem ubuntu@${ip}
 ```
 
-## Get root token and unseal key from the remote host at `onboarding/docker-compose/scripts/vault.txt` and copy it elsewhere
+### Get root token and unseal key from the remote host at `onboarding/docker-compose/scripts/vault.txt` and copy it elsewhere
 
 ```bash
 export VAULT_TOKEN=$(cat $HOME/onboarding/docker-compose/scripts/vault.txt | jq -r '.root_token')
 echo $VAULT_TOKEN
 ```
 
-# Helpful
+## Helpful Snippets
 
-## Get the Azure Secrets Engine config information w/ curl
+### Get the Azure Secrets Engine config information w/ curl
 
 ```bash
 curl $VAULT_ADDR/v1/sys/health
@@ -156,7 +162,7 @@ curl \
     $VAULT_ADDR/v1/azure-demo/roles
 ```
 
-## Get the Azure Secrets Engine config information w/ Vault CLI
+### Get the Azure Secrets Engine config information w/ Vault CLI
 
 ```bash
 vault read sys/health
@@ -164,6 +170,7 @@ vault read sys/mounts
 vault read azure-demo/config
 vault list azure-demo/roles
 
+# TODO: These don't work currently
 vault read azure-demo/creds/rg-alice-demoapp-dev-role
 vault read azure-demo/creds/rg-alice-demoapp-qa-role
 ```
