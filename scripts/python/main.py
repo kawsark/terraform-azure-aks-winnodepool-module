@@ -81,6 +81,7 @@ def build_create_ws_payload(ws):
 
 
 def build_create_var_payload(ws_id, var):
+	# TODO: have defaults for each variable
 	return  {
 		"data": {
 			"type": "vars",
@@ -123,7 +124,6 @@ def build_create_run_payload(ws_id):
 
 
 def create_ws(ws_config, tfc_client, vault_client):
-	# TODO: break down this function into multiple functions that can be re-used
 	org_name = ws_config["org_name"]
 	ws_name = ws_config["ws_name"]
 
@@ -151,9 +151,11 @@ def create_ws(ws_config, tfc_client, vault_client):
 def populate_tf_vars(ws_id, ws_config):
 	# Once the workspace is created, inject the user defined variables
 	# TODO: try catch on the variables if they already exist?
+	print("Populating TF variables...")
 	for var in ws_config["variables"]:
 		create_var_payload = build_create_var_payload(ws_id, var)
 		tfc_client.workspace_vars.create(ws_id, create_var_payload)
+	print("TF variables populated.")
 
 
 def populate_env_vars(ws_id, vault_azure_role):
@@ -164,9 +166,11 @@ def populate_env_vars(ws_id, vault_azure_role):
 	print("Azure Creds retrieved from Vault.")
 
 	# Inject the credentials into the workspace
+	print("Populating environment variables...")
 	for var in azure_creds_vars:
 		create_var_payload = build_create_var_payload(ws_id, var)
 		tfc_client.workspace_vars.create(ws_id, create_var_payload)
+	print("Environment variables populated.")
 
 
 def trigger_run(ws_id):
@@ -174,6 +178,7 @@ def trigger_run(ws_id):
 	create_run_payload = build_create_run_payload(ws_id)
 	created_run = tfc_client.runs.create(create_run_payload)
 	print(created_run)
+
 	# Wait for the run to complete, then create the next workspace
 
 
@@ -191,10 +196,11 @@ if __name__ == "__main__":
 	priv_config = config["privileged"]
 	unpriv_config = config["unprivileged"]
 
-	# TODO: Create the AKS cluster w/ elevated credentials
+	# Create the AKS cluster w/ elevated credentials
 	priv_ws = create_ws(priv_config, tfc_client, vault_client)
 	priv_ws_id = priv_ws["data"]["id"]
 	populate_tf_vars(priv_ws_id, priv_config)
 	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
+	# Create the secondary workspace with non-elevated credentials
 	# create_ws(config["unprivileged"], tfc_client, vault_client)
