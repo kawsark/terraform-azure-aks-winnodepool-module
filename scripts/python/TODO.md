@@ -1,6 +1,6 @@
 # TODO
 
-- Do this in the CI job on commit
+- Do this in the CI job on commit (figure out the working directory bit)
 - Create a subscription on the fly
 - Apply a policy set to the workspace to restrict the use of anything but modules
 - Variable sets?
