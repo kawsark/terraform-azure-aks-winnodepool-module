@@ -7,33 +7,43 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-privileged",
-		"variables": {
-			"environment": {
+		"variables": [
+			{
+				"key": "environment",
 				"value": "dev",
 				"sensitive": false,
-				"hcl": false
+				"hcl": false,
+				"category": "terraform"
 			},
-			"location": {
+			{
+				"key": "location",
 				"value": "Central US",
 				"sensitive": false,
-				"hcl": false
+				"hcl": false,
+				"category": "terraform"
 			},
-			"resource_group_name": {
+			{
+				"key": "resource_group_name",
 				"value": "hashi-atyeti-demo-terraform-aks",
 				"sensitive": false,
-				"hcl": false
+				"hcl": false,
+				"category": "terraform"
 			},
-			"ssh_key_resource_group": {
+			{
+				"key": "ssh_key_resource_group",
 				"value": "TODO",
 				"sensitive": false,
-				"hcl": false
+				"hcl": false,
+				"category": "terraform"
 			},
-			"ssh_key": {
+			{
+				"key": "ssh_key",
 				"value": "TODO",
 				"sensitive": false,
-				"hcl": false
+				"hcl": false,
+				"category": "terraform"
 			}
-		}
+		]
 	},
 	"unprivileged": {
 		"org_name": "GitLabCI-demos",
@@ -43,8 +53,6 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-unprivileged",
-		"variables": {
-
-		}
+		"variables": []
 	}
 }

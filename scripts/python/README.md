@@ -1,31 +1,42 @@
 # Setting up Vault from Scratch
 
-https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
-https://medium.com/hashicorp-engineering/onboarding-the-azure-secrets-engine-for-vault-f09d48c68b69
+[Kawsar's Blog](https://medium.com/hashicorp-engineering/onboarding-the-azure-secrets-engine-for-vault-f09d48c68b69) outlines what happens below.
+
+## Start a Vault Dev Server
 
 ```bash
 vault server -dev -dev-root-token-id=root
 ```
+
+## Export the Vault Env Vars
 
 ```bash
 export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_TOKEN="root"
 ```
 
+## Log in to Azure
+
 ```bash
 az login
 az account list
 ```
 
-```bash
-export CREDS_FILE_PATH="vault-demo.json"
-export ARM_SUBSCRIPTION_ID="14692f20-9428-451b-8298-102ed4e39c2a"
-```
+## TODO: Title
 
 ```bash
-az ad sp create-for-rbac -n "neil_vault_demo" --role="Owner" --scopes="/subscriptions/$ARM_SUBSCRIPTION_ID" > $CREDS_FILE_PATH
-export ARM_APP_OBJ_ID=$(az ad app list --filter "displayname eq 'neil_vault_demo'" | jq -r '.[].objectId')
+export CREDS_FILE_PATH="vault-demo.json"
+export ARM_SP_NAME="neil_vault_demo"
+export ARM_SUBSCRIPTION_ID=$(az account list | jq -r ".[0].id")
 ```
+
+## TODO: Title
+
+```bash
+az ad sp create-for-rbac -n $ARM_SP_NAME --role="Owner" --scopes="/subscriptions/$ARM_SUBSCRIPTION_ID" > $CREDS_FILE_PATH
+```
+
+## TODO: Title
 
 ```bash
 export ARM_CLIENT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .appId)"
@@ -33,6 +44,8 @@ export ARM_TENANT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .tenant)"
 export ARM_CLIENT_SECRET="$(cat ${CREDS_FILE_PATH} | jq -r .password)"
 export RESOURCE_GROUP="rg-alice-demoapp-dev" # TODO: why is this name hardcoded?
 ```
+
+## TODO: Title
 
 ```bash
 # Create owner Role assignment
@@ -66,6 +79,8 @@ Then create the resource group:
 ```bash
 az group create -l westus -n "${RESOURCE_GROUP}"
 ```
+
+# TODO: set the role name in an env var
 
 ```bash
 vault secrets enable azure

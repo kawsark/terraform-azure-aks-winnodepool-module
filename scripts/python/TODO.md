@@ -1,9 +1,7 @@
 # TODO
 
-- Setup a Vault
-- Get a secret from Vault
-- Create a subscription
-- Read from the config file
-- Check to see if the workspace exists
-- Create a subscription
-- Create the workspace
+- Create a subscription on the fly
+- Apply a policy set to the workspace to restrict the use of anything but modules
+- Variable sets?
+- Pass the subscription data into the new workspace
+- Do this in the CI job on commit
