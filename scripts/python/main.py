@@ -198,7 +198,8 @@ if __name__ == "__main__":
 	TIMEOUT_TIME=120
 	vault_client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN, timeout=TIMEOUT_TIME)
 	# get_azure_creds(vault_client, VAULT_AZURE_PRIV_ROLE)
-	test_azure(vault_client)
+	# test_azure(vault_client)
+	print("NEIL TESTING")
 
 	priv_config = config["privileged"]
 	unpriv_config = config["unprivileged"]

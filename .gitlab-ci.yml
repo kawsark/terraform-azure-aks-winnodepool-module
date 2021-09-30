@@ -27,8 +27,10 @@ run:
   script:
     - python setup.py bdist_wheel
     # an alternative approach is to install and run:
-    - pip install dist/*
+    # - pip install dist/*
+    - pip install -r pip-reqs.txt
     # run the command here
+    - python main.py
   artifacts:
     paths:
       - dist/*.whl
