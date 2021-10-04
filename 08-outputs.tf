@@ -26,7 +26,7 @@ output "latest_version" {
 }
 
 # Azure AD Group Object Id
-output "azure_ad_group_id" {
+/* output "azure_ad_group_id" {
   value = azuread_group.aks_administrators.id
 }
 output "azure_ad_group_objectid" {
@@ -34,7 +34,7 @@ output "azure_ad_group_objectid" {
 }
 output "object_id" {
   value = data.azuread_client_config.current.object_id
-}
+} */
 
 # Azure AKS Outputs
 
