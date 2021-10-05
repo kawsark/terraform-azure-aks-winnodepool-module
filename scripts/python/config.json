@@ -7,7 +7,7 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-privileged",
-		"auto_apply": false,
+		"auto_apply": true,
 		"variables": [
 			{
 				"key": "environment",
@@ -26,20 +26,6 @@
 			{
 				"key": "resource_group_name",
 				"value": "hashi-atyeti-demo-terraform-aks",
-				"sensitive": false,
-				"hcl": false,
-				"category": "terraform"
-			},
-			{
-				"key": "ssh_key_resource_group",
-				"value": "demouser-dev-ssh_rg",
-				"sensitive": false,
-				"hcl": false,
-				"category": "terraform"
-			},
-			{
-				"key": "ssh_key",
-				"value": "demouser-dev-ssh_key",
 				"sensitive": false,
 				"hcl": false,
 				"category": "terraform"

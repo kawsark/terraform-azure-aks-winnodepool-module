@@ -3,6 +3,7 @@ from terrasnek.exceptions import TFCHTTPNotFound
 import hvac
 import os
 import json
+import time
 
 # TODO: get the tfc token from Vault
 TFC_TOKEN = os.getenv("TFC_TOKEN", None)
@@ -14,13 +15,13 @@ VAULT_TOKEN = os.getenv("VAULT_TOKEN", None)
 # TODO: handle both Kawsar's public Vault instance and the local one
 # TODO: have one for privileged, one for unprivileged
 # TODO: how to handle the generated subscription?
-VAULT_AZURE_PRIV_ROLE="my-role"
-VAULT_AZURE_UNPRIV_ROLE="my-role"
-VAULT_AZURE_PATH="azure"
+# VAULT_AZURE_PRIV_ROLE="my-role"
+# VAULT_AZURE_UNPRIV_ROLE="my-role"
+# VAULT_AZURE_PATH="azure"
 # TODO: these roles don't work (rg-alice-demoapp-dev-role, rg-alice-demoapp-qa-role)
-# VAULT_AZURE_PRIV_ROLE="rg-alice-demoapp-qa-role"
-# VAULT_AZURE_UNPRIV_ROLE="rg-alice-demoapp-qa-role"
-# VAULT_AZURE_PATH="azure-demo"
+VAULT_AZURE_PRIV_ROLE="subscription-role"
+VAULT_AZURE_UNPRIV_ROLE="subscription-role"
+VAULT_AZURE_PATH="azure-demo"
 
 def get_azure_creds(vault_client, vault_azure_role):
 	azure_config = vault_client.secrets.azure.read_config(mount_point=VAULT_AZURE_PATH)
@@ -61,6 +62,7 @@ def get_azure_creds(vault_client, vault_azure_role):
 			"category": "env"
 		},
 	]
+	print(merged_creds_data)
 
 	return merged_creds_data
 
@@ -141,7 +143,7 @@ def create_ws(ws_config, tfc_client, vault_client):
 		# TODO: remove this when I'm not iterating, as this deletes the workspace
 		print(f"Workspace {ws_name} found, deleting it while iterating...")
 		tfc_client.workspaces.destroy(workspace_name=ws_name)
-		# workspace = None
+		workspace = None
 	except TFCHTTPNotFound:
 		print(f"Workspace {ws_name} not found.")
 
@@ -149,6 +151,7 @@ def create_ws(ws_config, tfc_client, vault_client):
 		print(f"Creating workspace {ws_name}")
 		create_ws_payload = build_create_ws_payload(ws_config)
 		workspace = tfc_client.workspaces.create(create_ws_payload)
+		time.sleep(2)
 
 	return workspace
 
@@ -197,18 +200,15 @@ if __name__ == "__main__":
 	# TODO: why does this take so long?
 	TIMEOUT_TIME=120
 	vault_client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN, timeout=TIMEOUT_TIME)
-	# get_azure_creds(vault_client, VAULT_AZURE_PRIV_ROLE)
-	# test_azure(vault_client)
-	print("NEIL TESTING")
 
 	priv_config = config["privileged"]
 	unpriv_config = config["unprivileged"]
 
 	# Create the AKS cluster w/ elevated credentials
-	# priv_ws = create_ws(priv_config, tfc_client, vault_client)
-	# priv_ws_id = priv_ws["data"]["id"]
-	# populate_tf_vars(priv_ws_id, priv_config)
-	# populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
+	priv_ws = create_ws(priv_config, tfc_client, vault_client)
+	priv_ws_id = priv_ws["data"]["id"]
+	populate_tf_vars(priv_ws_id, priv_config)
+	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
 	# Create the secondary workspace with non-elevated credentials
 	# create_ws(config["unprivileged"], tfc_client, vault_client)

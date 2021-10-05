@@ -173,4 +173,17 @@ vault list azure-demo/roles
 # TODO: These don't work currently
 vault read azure-demo/creds/rg-alice-demoapp-dev-role
 vault read azure-demo/creds/rg-alice-demoapp-qa-role
+vault read azure-demo/creds/subscription-role
+
+
+export CREDS_FILE_PATH="vault-demo.json"
+export ROLE_JSON_PATH="sub_role.json"
+export ARM_SUBSCRIPTION_ID=$(az account list | jq -r ".[0].id")
+export ARM_CLIENT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .appId)"
+export ARM_TENANT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .tenant)"
+export ARM_CLIENT_SECRET="$(cat ${CREDS_FILE_PATH} | jq -r .password)"
+
+vault read azure-demo/creds/subscription-role -format=json > $ROLE_JSON_PATH
+export ARM_CLIENT_ID=$(echo $ROLE_JSON_PATH | jq -r .data.client_id)
+export ARM_CLIENT_SECRET=$(echo $ROLE_JSON_PATH | jq -r .data.client_secret)
 ```

@@ -14,6 +14,7 @@ crash.log
 secrets.op.sh
 secrets.kawsar.sh
 vault-demo.json
+sub_role.json
 
 # Ignore any .tfvars files that are generated automatically for each Terraform run. Most
 # .tfvars files are managed as part of configuration and so should be included in

@@ -1,4 +1,4 @@
-# We will define 
+# We will define
 # 1. Terraform Settings Block
 # 1. Required Version Terraform
 # 2. Required Terraform Providers
@@ -9,8 +9,8 @@
 # 1. Terraform Settings Block
 terraform {
   # 1. Required Version Terraform
-  required_version = "= 1.0.7"
-  # 2. Required Terraform Providers  
+  required_version = "= 1.0.8"
+  # 2. Required Terraform Providers
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -33,7 +33,7 @@ terraform {
     storage_account_name  = "terraformstatexlrwdrzs"
     container_name        = "tfstatefiles"
     key                   = "terraform-custom-vnet.tfstate"
-  }  
+  }
 */
 }
 
