@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
 	tfc_client = TFC(TFC_TOKEN, url=TFC_URL, verify=False)
 
-	# TODO: why does this take so long?
+	# TODO: Why does Vault take so long here?
 	TIMEOUT_TIME=120
 	vault_client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN, timeout=TIMEOUT_TIME)
 
@@ -203,8 +203,8 @@ if __name__ == "__main__":
 	populate_tf_vars(priv_ws_id, priv_config)
 	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
-	# Create a second workspace, with the dev VM repo, and have the dependency on the first workspace
-	# https://gitlab.com/kawsark/terraform-azure-devvm-aks
+	# Create a second workspace, with the dev VM repo, and have the dependency on the
+	# first workspace (https://gitlab.com/kawsark/terraform-azure-devvm-aks)
 
 	# Create the secondary workspace with non-elevated credentials
 	unpriv_ws = create_ws(unpriv_config, tfc_client, vault_client)
@@ -225,3 +225,4 @@ if __name__ == "__main__":
 	# Populate with Azure credentials again (developer credentials)
 	populate_env_vars(unpriv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
+	# TODO: Authenticate w/ Vault from GitLab, get the Vault token and TFC token from Vault.
