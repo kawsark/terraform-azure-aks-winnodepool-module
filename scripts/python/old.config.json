@@ -3,15 +3,22 @@
 		"org_name": "GitLabCI-demos",
 		"vcs_oauth_id": "ot-kzVdMdDnvL3y4Ywt",
 		"vcs_repo": "kawsark/terraform-azure-aks-winnodepool",
-		"tf_version": "1.0.7",
+		"tf_version": "1.0.8",
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-privileged",
 		"auto_apply": true,
 		"variables": [
 			{
-				"key": "resource_group_name",
-				"value": "hashi-neil-demo-terraform-aks",
+				"key": "ssh_key_resource_group",
+				"value": "dev",
+				"sensitive": false,
+				"hcl": false,
+				"category": "terraform"
+			},
+			{
+				"key": "location",
+				"value": "Central US",
 				"sensitive": false,
 				"hcl": false,
 				"category": "terraform"
@@ -26,7 +33,7 @@
 		"working_dir": "",
 		"branch": "main",
 		"ws_name": "neil-test-aks-unprivileged",
-		"auto_apply": false,
+		"auto-apply": false,
 		"variables": []
 	}
 }

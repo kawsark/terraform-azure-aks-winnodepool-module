@@ -143,25 +143,6 @@ echo $VAULT_TOKEN
 
 ## Helpful Snippets
 
-### Get the Azure Secrets Engine config information w/ curl
-
-```bash
-curl $VAULT_ADDR/v1/sys/health
-
-curl \
-    --header "X-Vault-Token: $VAULT_TOKEN" \
-    $VAULT_ADDR/v1/sys/mounts
-
-curl \
-    --header "X-Vault-Token: $VAULT_TOKEN" \
-    $VAULT_ADDR/v1/azure-demo/config
-
-curl \
-    --header "X-Vault-Token: $VAULT_TOKEN" \
-    --request LIST \
-    $VAULT_ADDR/v1/azure-demo/roles
-```
-
 ### Get the Azure Secrets Engine config information w/ Vault CLI
 
 ```bash
@@ -171,19 +152,24 @@ vault read azure-demo/config
 vault list azure-demo/roles
 
 # TODO: These don't work currently
-vault read azure-demo/creds/rg-alice-demoapp-dev-role
-vault read azure-demo/creds/rg-alice-demoapp-qa-role
 vault read azure-demo/creds/subscription-role
-
 
 export CREDS_FILE_PATH="vault-demo.json"
 export ROLE_JSON_PATH="sub_role.json"
 export ARM_SUBSCRIPTION_ID=$(az account list | jq -r ".[0].id")
-export ARM_CLIENT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .appId)"
 export ARM_TENANT_ID="$(cat ${CREDS_FILE_PATH} | jq -r .tenant)"
-export ARM_CLIENT_SECRET="$(cat ${CREDS_FILE_PATH} | jq -r .password)"
 
 vault read azure-demo/creds/subscription-role -format=json > $ROLE_JSON_PATH
-export ARM_CLIENT_ID=$(echo $ROLE_JSON_PATH | jq -r .data.client_id)
-export ARM_CLIENT_SECRET=$(echo $ROLE_JSON_PATH | jq -r .data.client_secret)
+export ARM_CLIENT_ID=$(cat $ROLE_JSON_PATH | jq -r .data.client_id)
+export ARM_CLIENT_SECRET=$(cat $ROLE_JSON_PATH | jq -r .data.client_secret)
 ```
+
+export ARM_SUBSCRIPTION_ID="14692f20-9428-451b-8298-102ed4e39c2a"
+export ARM_TENANT_ID="0e3e2e88-8caf-41ca-b4da-e3b33b6c52ec"
+export ARM_CLIENT_ID=""
+export ARM_CLIENT_SECRET=""
+
+echo $ARM_SUBSCRIPTION_ID
+echo $ARM_TENANT_ID
+echo $ARM_CLIENT_ID
+echo $ARM_CLIENT_SECRET

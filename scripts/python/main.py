@@ -13,12 +13,6 @@ VAULT_ADDR = os.getenv("VAULT_ADDR", "http://localhost:8200")
 VAULT_TOKEN = os.getenv("VAULT_TOKEN", None)
 
 # TODO: handle both Kawsar's public Vault instance and the local one
-# TODO: have one for privileged, one for unprivileged
-# TODO: how to handle the generated subscription?
-# VAULT_AZURE_PRIV_ROLE="my-role"
-# VAULT_AZURE_UNPRIV_ROLE="my-role"
-# VAULT_AZURE_PATH="azure"
-# TODO: these roles don't work (rg-alice-demoapp-dev-role, rg-alice-demoapp-qa-role)
 VAULT_AZURE_PRIV_ROLE="subscription-role"
 VAULT_AZURE_UNPRIV_ROLE="subscription-role"
 VAULT_AZURE_PATH="azure-demo"
@@ -62,7 +56,6 @@ def get_azure_creds(vault_client, vault_azure_role):
 			"category": "env"
 		},
 	]
-	print(merged_creds_data)
 
 	return merged_creds_data
 
@@ -210,5 +203,25 @@ if __name__ == "__main__":
 	populate_tf_vars(priv_ws_id, priv_config)
 	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
+	# Create a second workspace, with the dev VM repo, and have the dependency on the first workspace
+	# https://gitlab.com/kawsark/terraform-azure-devvm-aks
+
 	# Create the secondary workspace with non-elevated credentials
-	# create_ws(config["unprivileged"], tfc_client, vault_client)
+	unpriv_ws = create_ws(unpriv_config, tfc_client, vault_client)
+	unpriv_ws_id = unpriv_ws["data"]["id"]
+
+	# Add the private workspace name to the variables
+	priv_ws_name = priv_ws["data"]["attributes"]["name"]
+	priv_ws_name_var = {
+		"key": "tfc_aks_workspace",
+		"value": priv_ws_name,
+		"sensitive": False,
+		"hcl": False,
+		"category": "terraform"
+	}
+	unpriv_config["variables"].append(priv_ws_name_var)
+	populate_tf_vars(unpriv_ws_id, unpriv_config)
+
+	# Populate with Azure credentials again (developer credentials)
+	populate_env_vars(unpriv_ws_id, VAULT_AZURE_PRIV_ROLE)
+

@@ -29,6 +29,8 @@ run:
     # - python setup.py bdist_wheel
     # an alternative approach is to install and run:
     # - pip install dist/*
+    - echo $TFC_URL
+    - echo $VAULT_ADDR
     - pwd
     - ls
     - pip install -r pip-reqs.txt
