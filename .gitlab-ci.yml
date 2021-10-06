@@ -29,9 +29,13 @@ run:
     # - python setup.py bdist_wheel
     # an alternative approach is to install and run:
     # - pip install dist/*
-    - curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
-    - apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-    - apt-get update && apt-get install vault
+    - export VAULT_DIST_URL="https://releases.hashicorp.com/vault"
+    - export VAULT_VERSION="1.8.4"
+    - curl --silent --remote-name "${VAULT_DIST_URL}/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+    - unzip vault_${VAULT_VERSION}_linux_amd64.zip
+    - sudo chown root:root vault
+    - sudo mv vault /usr/local/bin/
+    - vault --version
     - echo $TFC_URL
     - echo $VAULT_ADDR
     # - echo $TFC_TOKEN
