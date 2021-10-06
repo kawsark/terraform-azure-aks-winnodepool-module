@@ -34,6 +34,7 @@ run:
     - echo $TFC_URL
     - echo $VAULT_ADDR
     - echo $TFC_TOKEN
+    - echo $VAULT_TOKEN
     - pwd
     - ls
     - pip install -r pip-reqs.txt
