@@ -6,6 +6,8 @@ image: python:latest
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  TFC_URL: $TFC_URL
+  VAULT_ADDR: $VAULT_ADDR
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
@@ -29,8 +31,8 @@ run:
     # - python setup.py bdist_wheel
     # an alternative approach is to install and run:
     # - pip install dist/*
-    - echo $TFC_URL
-    - echo $VAULT_ADDR
+    - echo "$TFC_URL"
+    - echo "$VAULT_ADDR"
     - pwd
     - ls
     - pip install -r pip-reqs.txt
