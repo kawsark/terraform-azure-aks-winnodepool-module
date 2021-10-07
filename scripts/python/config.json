@@ -6,7 +6,7 @@
 		"tf_version": "1.0.7",
 		"working_dir": "",
 		"branch": "main",
-		"ws_name": "neil-test-aks-privileged-1",
+		"ws_name": "neil-test-aks-privileged",
 		"auto_apply": true,
 		"variables": [
 			{
@@ -25,7 +25,7 @@
 		"tf_version": "1.0.7",
 		"working_dir": "",
 		"branch": "main",
-		"ws_name": "neil-test-aks-unprivileged-2",
+		"ws_name": "neil-test-aks-unprivileged",
 		"auto_apply": false,
 		"variables": []
 	}

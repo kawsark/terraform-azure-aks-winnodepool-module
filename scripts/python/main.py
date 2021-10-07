@@ -12,10 +12,12 @@ TFC_URL = os.getenv("TFC_URL", None)  # ex: https://app.terraform.io
 VAULT_ADDR = os.getenv("VAULT_ADDR", "http://localhost:8200")
 VAULT_TOKEN = os.getenv("VAULT_TOKEN", None)
 
-# TODO: handle both Kawsar's public Vault instance and the local one
 VAULT_AZURE_PRIV_ROLE="subscription-role"
 VAULT_AZURE_UNPRIV_ROLE="subscription-role"
 VAULT_AZURE_PATH="azure-demo"
+
+POLICY_SET_ID = "polset-bgk7gXWfucfaFMtS"
+
 
 def get_azure_creds(vault_client, vault_azure_role):
 	azure_config = vault_client.secrets.azure.read_config(mount_point=VAULT_AZURE_PATH)
@@ -134,9 +136,9 @@ def create_ws(ws_config, tfc_client, vault_client):
 		workspace = tfc_client.workspaces.show(workspace_name=ws_name)
 		# NOTE: only use this when not auto-applying, as then we may have orphaned resources
 		# TODO: remove this when I'm not iterating, as this deletes the workspace
-		print(f"Workspace {ws_name} found, deleting it while iterating...")
-		tfc_client.workspaces.destroy(workspace_name=ws_name)
-		workspace = None
+		# print(f"Workspace {ws_name} found, deleting it while iterating...")
+		# tfc_client.workspaces.destroy(workspace_name=ws_name)
+		# workspace = None
 	except TFCHTTPNotFound:
 		print(f"Workspace {ws_name} not found.")
 
@@ -190,7 +192,6 @@ if __name__ == "__main__":
 
 	tfc_client = TFC(TFC_TOKEN, url=TFC_URL, verify=False)
 
-	# TODO: Why does Vault take so long here?
 	TIMEOUT_TIME=120
 	vault_client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN, timeout=TIMEOUT_TIME)
 
@@ -200,15 +201,27 @@ if __name__ == "__main__":
 	# Create the AKS cluster w/ elevated credentials
 	priv_ws = create_ws(priv_config, tfc_client, vault_client)
 	priv_ws_id = priv_ws["data"]["id"]
+
+	# Attach the policy set to the privileged workspace
+	attach_policy_set_payload = {
+		"data": [
+			{
+				"id": priv_ws_id,
+				"type": "workspaces"
+			},
+  		]
+	}
+	tfc_client.policy_sets.attach_policy_set_to_workspaces(POLICY_SET_ID, attach_policy_set_payload)
+
 	populate_tf_vars(priv_ws_id, priv_config)
 	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
-	trigger_run(priv_ws_id)
 
 	# Create a second workspace, with the dev VM repo, and have the dependency on the
 	# first workspace (https://gitlab.com/kawsark/terraform-azure-devvm-aks)
 	unpriv_ws = create_ws(unpriv_config, tfc_client, vault_client)
 	unpriv_ws_id = unpriv_ws["data"]["id"]
 
+	# Attach a run trigger to the workspace for when the privileged workspace finishes
 	run_trigger_payload = {
 		"data": {
 			"relationships": {
@@ -221,7 +234,10 @@ if __name__ == "__main__":
 			}
 		}
 	}
-	tfc_client.run_triggers.create(unpriv_ws, run_trigger_payload)
+	tfc_client.run_triggers.create(unpriv_ws_id, run_trigger_payload)
+
+	# Now that the run triger is in place, trigger the run on the privileged workspace
+	# TODO: trigger_run(priv_ws_id)
 
 	# Add the private workspace name to the variables
 	priv_ws_name = priv_ws["data"]["attributes"]["name"]
@@ -237,6 +253,4 @@ if __name__ == "__main__":
 
 	# Populate with Azure credentials again (developer credentials)
 	# TODO: make these use a different, less privileged role.
-	populate_env_vars(unpriv_ws_id, VAULT_AZURE_PRIV_ROLE)
-
-	# TODO: Authenticate w/ Vault from GitLab, get the Vault token and TFC token from Vault.
+	populate_env_vars(unpriv_ws_id, VAULT_AZURE_UNPRIV_ROLE)
