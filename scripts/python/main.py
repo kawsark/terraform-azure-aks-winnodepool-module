@@ -202,11 +202,26 @@ if __name__ == "__main__":
 	priv_ws_id = priv_ws["data"]["id"]
 	populate_tf_vars(priv_ws_id, priv_config)
 	populate_env_vars(priv_ws_id, VAULT_AZURE_PRIV_ROLE)
+	trigger_run(priv_ws_id)
 
 	# Create a second workspace, with the dev VM repo, and have the dependency on the
 	# first workspace (https://gitlab.com/kawsark/terraform-azure-devvm-aks)
 	unpriv_ws = create_ws(unpriv_config, tfc_client, vault_client)
 	unpriv_ws_id = unpriv_ws["data"]["id"]
+
+	run_trigger_payload = {
+		"data": {
+			"relationships": {
+				"sourceable": {
+					"data": {
+						"id": priv_ws_id,
+						"type": "workspaces"
+					}
+				}
+			}
+		}
+	}
+	tfc_client.run_triggers.create(unpriv_ws, run_trigger_payload)
 
 	# Add the private workspace name to the variables
 	priv_ws_name = priv_ws["data"]["attributes"]["name"]
