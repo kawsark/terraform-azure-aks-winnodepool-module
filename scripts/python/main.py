@@ -237,7 +237,7 @@ if __name__ == "__main__":
 	tfc_client.run_triggers.create(unpriv_ws_id, run_trigger_payload)
 
 	# Now that the run triger is in place, trigger the run on the privileged workspace
-	# TODO: trigger_run(priv_ws_id)
+	trigger_run(priv_ws_id)
 
 	# Add the private workspace name to the variables
 	priv_ws_name = priv_ws["data"]["attributes"]["name"]
