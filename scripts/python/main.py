@@ -205,8 +205,6 @@ if __name__ == "__main__":
 
 	# Create a second workspace, with the dev VM repo, and have the dependency on the
 	# first workspace (https://gitlab.com/kawsark/terraform-azure-devvm-aks)
-
-	# Create the secondary workspace with non-elevated credentials
 	unpriv_ws = create_ws(unpriv_config, tfc_client, vault_client)
 	unpriv_ws_id = unpriv_ws["data"]["id"]
 
@@ -223,6 +221,7 @@ if __name__ == "__main__":
 	populate_tf_vars(unpriv_ws_id, unpriv_config)
 
 	# Populate with Azure credentials again (developer credentials)
+	# TODO: make these use a different, less privileged role.
 	populate_env_vars(unpriv_ws_id, VAULT_AZURE_PRIV_ROLE)
 
 	# TODO: Authenticate w/ Vault from GitLab, get the Vault token and TFC token from Vault.
