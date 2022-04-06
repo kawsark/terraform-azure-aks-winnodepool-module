@@ -9,7 +9,7 @@
 # 1. Terraform Settings Block
 terraform {
   # 1. Required Version Terraform
-  required_version = "= 1.0.7"
+  required_version = ">= 1.0.7"
   # 2. Required Terraform Providers  
   required_providers {
     azurerm = {
